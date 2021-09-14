@@ -3,15 +3,7 @@ from django.db.models.fields import BooleanField, CharField, FloatField
 
 
 # Create your models here.
-class Question(models.Model):
-    question_text = models.CharField(max_length=200)
-    time_pub = models.TimeField()
 
-
-class Choice(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    choice = models.CharField(max_length=200)
-    vote = models.IntegerField(default=0)
 
 
 class Login(models.Model):
@@ -26,6 +18,9 @@ class Categories(models.Model):
     category_name = CharField(max_length=255)
     category_in = CharField(max_length=255,null=True)
 
+    def __str__(self) :
+        return self.category_name
+
 class Products(models.Model):
     category = models.ForeignKey(Categories, on_delete=models.CASCADE)
     product_name = CharField(max_length=255)
@@ -35,6 +30,13 @@ class Products(models.Model):
     taitle = CharField(max_length=1000)
     status = BooleanField()
 
+    def __str__(self) :
+        id = str(self.id)
+        return id
 
 class Cart(models.Model):
-    pass
+    username = models.CharField(max_length=50,primary_key=True)
+    item = models.TextField()
+
+    def __str__(self) :
+        return self.username

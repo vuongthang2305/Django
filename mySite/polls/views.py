@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Question, Login, Categories, Products
+from .models import Login, Categories, Products, Cart
 from django.http import HttpResponse
 
 
@@ -19,11 +19,15 @@ def eventLogin(request):
         if username == i.username and password == i.password:
             context['status'] = 1
             context['username'] = i.username
-            return render(request, 'polls/product.html', context)    
+            response = render(request, 'polls/product.html', context)
+            response.set_cookie('username', str(context['username']))  
+            return response
         else:
             context['status'] = 0
     if context['status'] == 0:
-        return render(request, 'polls/login.html', context)
+        response = render(request, 'polls/product.html', context)
+        response.set_cookie('username', str(context['username']))
+        return response
     else:
         return render(request, 'polls/product.html', context)
 
@@ -42,9 +46,6 @@ def sign_up(request):
     except:
         content['status1'] = 0
         return render(request, 'polls/login.html', content)
-
-
-
 
 def shop(request):
     context = showAllProduct() 
@@ -78,4 +79,13 @@ def product_detail(request, id_product):
     return render(request, 'polls/product_detail.html',content)
     
 def cart(request):
-    return render(request, 'polls/cart.html')
+    username = str(request.COOKIES['username'])
+    cart = Cart.objects.get(pk=username)
+    product_list = []
+    content = {'product':product_list}
+    
+    
+    for ids in str(cart.item).split(','):
+        product_list.append(Products.objects.get(pk=ids))
+    
+    return render(request, 'polls/cart.html', content)
